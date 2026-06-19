@@ -21,6 +21,26 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # ✅ 新增：同时 clone 你的 Vault 仓库
+      - name: Checkout Obsidian Vault
+        uses: actions/checkout@v4
+        with:
+          repository: PPnostalgia/FinanceMindObsidianRepo
+          path: vault
+          # 如果是私有仓库，需要配置 token（见下方说明）
+          token: ${{ secrets.VAULT_TOKEN }}
+
+      # ✅ 新增：把 Vault 公开内容复制到 content 目录
+      - name: Sync vault content
+        run: |
+          rm -rf content
+          mkdir content
+          # 复制首页
+          cp vault/index.md content/
+          # 复制公众号文章
+          cp -r vault/01-Wechat content/ 2>/dev/null || true
+          # 复制知识库
+          cp -r vault/02-KnowledgeBase content/ 2>/dev/null || true
 
       - uses: actions/setup-node@v4
         with:
