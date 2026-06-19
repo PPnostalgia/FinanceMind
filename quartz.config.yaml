@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Quartz 5
+  pageTitle: Finance & Mind
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
@@ -9,9 +9,11 @@ configuration:
   locale: en-US
   baseUrl: ppnostalgia.github.io
   ignorePatterns:
-    - private
-    - templates
-    - .obsidian
+    - "00-Issues"
+    - "04-Archive"
+    - "03-Templates"
+    - ".obsidian"
+    - "**/*.pdf"
   theme:
     fontOrigin: googleFonts
     cdnCaching: true
@@ -41,6 +43,34 @@ configuration:
         highlight: rgba(143, 159, 169, 0.15)
         textHighlight: "#b3aa0288"
 plugins:
+  # 只发布 frontmatter 含 publish: true 的文件
+  - source: github:quartz-community/explicit-publish
+    enabled: true
+  # 支持 Obsidian 双链语法
+  - source: github:quartz-community/obsidian-flavored-markdown
+    enabled: true
+
+  # 左侧目录树
+  - source: github:quartz-community/explorer
+    enabled: true
+    layout:
+      position: left
+      priority: 50
+
+  # 知识图谱可视化
+  - source: github:quartz-community/graph
+    enabled: true
+    layout:
+      position: right
+      priority: 10
+
+  # 全文搜索
+  - source: github:quartz-community/search
+    enabled: true
+
+  # 反向链接（显示哪些文章引用了当前文章）
+  - source: github:quartz-community/backlinks
+    enabled: true
   - source: github:quartz-community/created-modified-date
     enabled: true
     options:
