@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ─────────────────────────────────────────────────────── */
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-body;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-header;
+  }
+}
+
+/* ── Article prose ────────────────────────────────────────────── */
+
+.article-body {
+  @apply text-[1.0rem] leading-[1.85] text-ink-mid;
+}
+
+.article-body p,
+.article-body li {
+  @apply leading-[1.9];
+  letter-spacing: 0.015em;
+}
+
+.article-body p {
+  @apply my-[0.85rem];
+}
+
+/* h2 — 本期导读 / 精读正文 / 文化知识延伸 / 今日金句 等 */
+.article-body h2 {
+  @apply text-[1.1rem] font-bold mt-12 mb-5 pb-[0.65rem] pl-[0.85rem] text-ink;
+  border-left: 3px solid #9c5a3c;
+  border-bottom: 1px solid #e8e3d8;
+}
+
+/* h3 — ### Para 1 / Para 2 段落标记 */
+.article-body h3 {
+  @apply text-[0.78rem] font-bold uppercase text-muted mt-10 mb-5 flex items-center gap-3;
+  letter-spacing: 0.15em;
+}
+
+.article-body h3::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e8e3d8;
+}
+
+/* 行内标签段落：**译文** **生词注释** **长难句解析** 等 */
+.article-body p:has(> strong:only-child) {
+  @apply mt-7 mb-1;
+}
+
+.article-body p:has(> strong:only-child) > strong {
+  @apply inline-block text-[0.72rem] font-bold tracking-widest uppercase text-primary rounded;
+  background: rgba(156, 90, 60, 0.10);
+  padding: 0.15rem 0.5rem;
+}
+
+/* blockquote — 译文/金句/长难句 */
+.article-body blockquote {
+  @apply my-2 py-4 px-5 rounded-r-lg;
+  margin-left: 0;
+  border-left: 3px solid #9c5a3c;
+  background: rgba(232, 227, 216, 0.30);
+}
+
+.article-body blockquote p {
+  @apply my-0 leading-[1.9];
+}
+
+/* hr — 渲染为 · · · 装饰分隔 */
+.article-body hr {
+  @apply border-none bg-transparent h-auto text-center text-muted my-10;
+  letter-spacing: 0.6em;
+}
+
+.article-body hr::after {
+  content: '· · ·';
+}
+
+/* 无序列表生词注释 */
+.article-body ul {
+  @apply pl-5 space-y-1;
+}
+
+.article-body ul li {
+  @apply text-[0.95rem];
+}
+
+/* 实践清单 checklist */
+.article-body ul:has(> li > input[type="checkbox"]) {
+  @apply list-none pl-0 space-y-1;
+}
+
+.article-body ul:has(> li > input[type="checkbox"]) > li {
+  @apply flex items-start gap-2 py-[0.4rem] px-[0.6rem] rounded transition-colors;
+}
+
+.article-body ul:has(> li > input[type="checkbox"]) > li:hover {
+  background: rgba(156, 90, 60, 0.08);
+}
+
+/* inline code */
+.article-body code {
+  @apply font-mono text-[0.875em] bg-border/50 px-1 py-0.5 rounded;
+}
+
+/* links */
+.article-body a {
+  @apply text-primary underline decoration-primary/40 underline-offset-2 transition-colors;
+}
+
+.article-body a:hover {
+  @apply decoration-primary;
+}
+
+/* tags pill */
+.tag-pill {
+  @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full border transition-colors;
+  background: rgba(122, 139, 111, 0.12);
+  color: #4e6248;
+  border-color: rgba(122, 139, 111, 0.28);
+}
+
+.tag-pill:hover {
+  background: rgba(122, 139, 111, 0.22);
+}

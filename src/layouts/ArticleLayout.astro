@@ -1,0 +1,135 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  date?: Date;
+  discipline?: string;
+  tags?: string[];
+  sourceArticle?: string;
+  sourceIssue?: string;
+  type: 'wechat' | 'kb';
+}
+
+const { title, subtitle, date, discipline, tags = [], sourceArticle, sourceIssue, type } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const disciplineLabels: Record<string, string> = {
+  economics:      '行为金融',
+  'mental-models': '思维模型',
+  'science-tech':  '科技前沿',
+  psychology:      '心理学',
+};
+
+const formattedDate = date ? date.toLocaleDateString('zh-CN', {
+  year: 'numeric', month: 'long', day: 'numeric'
+}) : undefined;
+---
+
+<BaseLayout title={title}>
+  <div class="max-w-5xl mx-auto px-5 py-10">
+    <!-- Breadcrumb -->
+    <nav class="text-xs text-muted mb-8 flex items-center gap-2">
+      <a href={`${base}/`} class="hover:text-primary transition-colors no-underline">首页</a>
+      <span>›</span>
+      {type === 'wechat' ? (
+        <a href={`${base}/wechat/`} class="hover:text-primary transition-colors no-underline">精读文章</a>
+      ) : (
+        <>
+          <a href={`${base}/kb/`} class="hover:text-primary transition-colors no-underline">知识库</a>
+          {discipline && (
+            <>
+              <span>›</span>
+              <a href={`${base}/kb/${discipline}/`} class="hover:text-primary transition-colors no-underline">
+                {disciplineLabels[discipline] ?? discipline}
+              </a>
+            </>
+          )}
+        </>
+      )}
+      <span>›</span>
+      <span class="text-ink-mid truncate max-w-xs">{title}</span>
+    </nav>
+
+    <div class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-12">
+      <!-- Article -->
+      <article>
+        <!-- Header -->
+        <header class="mb-10">
+          {discipline && (
+            <span class="inline-block text-xs font-semibold tracking-widest uppercase text-secondary mb-3">
+              {disciplineLabels[discipline] ?? discipline}
+            </span>
+          )}
+          <h1 class="font-header text-[1.85rem] font-bold leading-snug text-ink mb-4">{title}</h1>
+          {subtitle && <p class="text-base text-muted">{subtitle}</p>}
+
+          <div class="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-border text-sm text-muted">
+            {formattedDate && <span>{formattedDate}</span>}
+            {sourceIssue && (
+              <span class="font-mono text-xs bg-border/60 px-2 py-0.5 rounded">{sourceIssue}</span>
+            )}
+            {sourceArticle && (
+              <span class="italic text-xs">原文：{sourceArticle}</span>
+            )}
+          </div>
+
+          {tags.length > 0 && (
+            <div class="flex flex-wrap gap-1.5 mt-3">
+              {tags.map(tag => (
+                <span class="tag-pill">#{tag}</span>
+              ))}
+            </div>
+          )}
+        </header>
+
+        <!-- Content -->
+        <div class="article-body">
+          <slot />
+        </div>
+
+        <!-- Back link -->
+        <div class="mt-14 pt-6 border-t border-border">
+          <a
+            href={type === 'wechat' ? `${base}/wechat/` : `${base}/kb/${discipline}/`}
+            class="text-sm text-primary hover:text-secondary transition-colors no-underline font-medium"
+          >
+            ← 返回列表
+          </a>
+        </div>
+      </article>
+
+      <!-- Sidebar (desktop only) -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-20 space-y-6">
+          <!-- About this section -->
+          <div class="rounded-lg border border-border p-4 bg-white/50">
+            <p class="text-xs font-semibold uppercase tracking-widest text-muted mb-3">关于本站</p>
+            <p class="text-xs text-ink-mid leading-relaxed">
+              每周精读一篇《经济学人》文章，提炼英语语感与知识增量，沉淀为可复用的思维工具。
+            </p>
+            <div class="mt-4 space-y-1">
+              <a href={`${base}/wechat/`} class="flex items-center gap-2 text-xs text-ink-mid hover:text-primary transition-colors no-underline py-1">
+                <span>📰</span><span>所有精读文章</span>
+              </a>
+              <a href={`${base}/kb/`} class="flex items-center gap-2 text-xs text-ink-mid hover:text-primary transition-colors no-underline py-1">
+                <span>📚</span><span>知识库总览</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          {tags.length > 0 && (
+            <div class="rounded-lg border border-border p-4 bg-white/50">
+              <p class="text-xs font-semibold uppercase tracking-widest text-muted mb-3">标签</p>
+              <div class="flex flex-wrap gap-1.5">
+                {tags.map(tag => <span class="tag-pill">#{tag}</span>)}
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

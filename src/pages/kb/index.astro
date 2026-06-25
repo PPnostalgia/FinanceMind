@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const entries = await getCollection('kb', e => e.data.publish);
+
+const disciplineConfig = [
+  { key: 'economics',      icon: '💰', title: '行为金融', desc: '宏观经济 · 市场机制 · 金融理论' },
+  { key: 'mental-models',  icon: '🧠', title: '思维模型', desc: '决策框架 · 芒格体系 · 认知工具' },
+  { key: 'science-tech',   icon: '💻', title: '科技前沿', desc: '科技趋势 · AI · 产品与职业'    },
+  { key: 'psychology',     icon: '🎯', title: '心理学',   desc: '认知偏误 · 行为研究 · 心理效应' },
+];
+
+function countForDiscipline(key: string) {
+  return entries.filter(e => {
+    return e.data.discipline === key || e.id.startsWith(key + '/');
+  }).length;
+}
+
+const latestByDiscipline: Record<string, typeof entries[number] | undefined> = {};
+for (const d of disciplineConfig) {
+  latestByDiscipline[d.key] = entries
+    .filter(e => e.data.discipline === d.key || e.id.startsWith(d.key + '/'))
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+}
+---
+
+<BaseLayout title="知识库" description="将《经济学人》洞见沉淀为可复用的思维工具">
+  <div class="max-w-3xl mx-auto px-5 py-10">
+    <header class="mb-10">
+      <nav class="text-xs text-muted mb-6 flex items-center gap-2">
+        <a href={`${base}/`} class="hover:text-primary transition-colors no-underline">首页</a>
+        <span>›</span>
+        <span class="text-ink-mid">知识库</span>
+      </nav>
+      <h1 class="font-header text-[1.9rem] font-bold text-ink mb-2">知识库</h1>
+      <p class="text-sm text-muted">从精读文章中提炼的认知工具，按领域分类沉淀</p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {disciplineConfig.map(d => {
+        const count = countForDiscipline(d.key);
+        const latest = latestByDiscipline[d.key];
+        return (
+          <a
+            href={`${base}/kb/${d.key}/`}
+            class="group flex flex-col gap-3 p-5 rounded-xl border border-border bg-white/50 hover:border-primary/40 hover:shadow-[0_4px_18px_rgba(0,0,0,0.07)] hover:-translate-y-0.5 transition-all no-underline"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-[2rem] leading-none">{d.icon}</span>
+              <div>
+                <p class="text-[0.98rem] font-semibold text-ink group-hover:text-primary transition-colors font-header">
+                  {d.title}
+                </p>
+                <p class="text-xs text-muted mt-0.5">{d.desc}</p>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-border flex items-center justify-between">
+              <span class="text-xs text-muted">{count > 0 ? `${count} 个概念` : '暂无内容'}</span>
+              {latest && (
+                <span class="text-xs text-muted truncate max-w-[160px]">最新：{latest.data.title}</span>
+              )}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    {entries.length === 0 && (
+      <p class="text-sm text-muted py-8 text-center mt-8">
+        暂无内容。运行 <code class="font-mono bg-border/60 px-1 rounded">npm run sync-content</code> 同步内容。
+      </p>
+    )}
+  </div>
+</BaseLayout>

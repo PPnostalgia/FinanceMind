@@ -1,0 +1,29 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('wechat', e => e.data.publish);
+  return articles.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+interface Props { entry: CollectionEntry<'wechat'>; }
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<ArticleLayout
+  title={entry.data.title}
+  subtitle={entry.data.source_article ? `原文：${entry.data.source_article}` : undefined}
+  date={entry.data.date}
+  discipline={entry.data.discipline}
+  tags={entry.data.tags}
+  sourceArticle={entry.data.source_article}
+  sourceIssue={entry.data.source_issue}
+  type="wechat"
+>
+  <Content />
+</ArticleLayout>

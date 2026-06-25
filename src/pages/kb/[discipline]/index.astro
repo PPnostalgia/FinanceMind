@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+export async function getStaticPaths() {
+  const disciplines = ['economics', 'mental-models', 'science-tech', 'psychology'];
+  return disciplines.map(d => ({ params: { discipline: d } }));
+}
+
+const { discipline } = Astro.params;
+
+const disciplineConfig: Record<string, { icon: string; title: string; desc: string }> = {
+  'economics':      { icon: '💰', title: '行为金融', desc: '宏观经济 · 市场机制 · 金融理论' },
+  'mental-models':  { icon: '🧠', title: '思维模型', desc: '决策框架 · 芒格体系 · 认知工具' },
+  'science-tech':   { icon: '💻', title: '科技前沿', desc: '科技趋势 · AI · 产品与职业'    },
+  'psychology':     { icon: '🎯', title: '心理学',   desc: '认知偏误 · 行为研究 · 心理效应' },
+};
+
+const config = disciplineConfig[discipline!] ?? { icon: '📚', title: discipline, desc: '' };
+
+const allKb = await getCollection('kb', e => e.data.publish);
+const entries = allKb
+  .filter(e => e.data.discipline === discipline || e.id.startsWith(discipline + '/'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function getSlug(entry: typeof entries[number]) {
+  const parts = entry.id.split('/');
+  return parts[parts.length - 1].replace(/\.md$/, '');
+}
+---
+
+<BaseLayout title={config.title}>
+  <div class="max-w-3xl mx-auto px-5 py-10">
+    <header class="mb-10">
+      <nav class="text-xs text-muted mb-6 flex items-center gap-2">
+        <a href={`${base}/`} class="hover:text-primary transition-colors no-underline">首页</a>
+        <span>›</span>
+        <a href={`${base}/kb/`} class="hover:text-primary transition-colors no-underline">知识库</a>
+        <span>›</span>
+        <span class="text-ink-mid">{config.title}</span>
+      </nav>
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-[2rem] leading-none">{config.icon}</span>
+        <h1 class="font-header text-[1.9rem] font-bold text-ink">{config.title}</h1>
+      </div>
+      <p class="text-sm text-muted">{config.desc}</p>
+    </header>
+
+    {entries.length === 0 ? (
+      <p class="text-sm text-muted py-12 text-center">该领域暂无内容。</p>
+    ) : (
+      <div class="divide-y divide-border">
+        {entries.map(entry => {
+          const slug = getSlug(entry);
+          return (
+            <a
+              href={`${base}/kb/${discipline}/${slug}/`}
+              class="group flex items-start justify-between gap-6 py-5 -mx-3 px-3 rounded-lg hover:bg-white/60 transition-colors no-underline"
+            >
+              <div class="flex-1 min-w-0">
+                <h2 class="font-header text-[1.0rem] font-semibold text-ink group-hover:text-primary transition-colors leading-snug mb-1">
+                  {entry.data.title}
+                </h2>
+                {entry.data.title_en && (
+                  <p class="text-xs text-muted italic">{entry.data.title_en}</p>
+                )}
+                {entry.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    {entry.data.tags.map(t => <span class="tag-pill">#{t}</span>)}
+                  </div>
+                )}
+              </div>
+              <div class="shrink-0 text-right">
+                {entry.data.source_issue && (
+                  <span class="text-xs font-mono text-muted bg-border/60 px-1.5 py-0.5 rounded block mb-1">
+                    {entry.data.source_issue}
+                  </span>
+                )}
+                <span class="text-xs text-muted font-mono">
+                  {entry.data.date.toLocaleDateString('zh-CN', {
+                    year: 'numeric', month: '2-digit', day: '2-digit'
+                  }).replace(/\//g, '-')}
+                </span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</BaseLayout>

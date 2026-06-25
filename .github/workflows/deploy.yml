@@ -1,9 +1,11 @@
-name: Deploy Quartz site to GitHub Pages
+name: Deploy Finance & Mind to GitHub Pages
 
 on:
   push:
     branches:
+      - main
       - v5
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,61 +13,62 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      # ✅ 新增：同时 clone 你的 Vault 仓库
+      - name: Checkout site code
+        uses: actions/checkout@v4
+
       - name: Checkout Obsidian Vault
         uses: actions/checkout@v4
         with:
           repository: PPnostalgia/FinanceMindObsidianRepo
           path: vault
-          # 如果是私有仓库，需要配置 token（见下方说明）
           token: ${{ secrets.VAULT_TOKEN }}
 
-      # ✅ 新增：把 Vault 公开内容复制到 content 目录
-      - name: Sync vault content
+      - name: Sync vault content to Astro
         run: |
-          rm -rf content
-          mkdir content
-          # 复制首页
-          cp vault/index.md content/
-          # 复制公众号文章
-          cp -r vault/01-Wechat content/ 2>/dev/null || true
-          # 复制知识库
-          cp -r vault/02-KnowledgeBase content/ 2>/dev/null || true
+          mkdir -p src/content/wechat \
+                   src/content/kb/economics \
+                   src/content/kb/mental-models \
+                   src/content/kb/science-tech \
+                   src/content/kb/psychology
+          # Wechat articles
+          cp vault/01-Wechat/*.md src/content/wechat/ 2>/dev/null || echo "No wechat files"
+          # Knowledge base
+          for dir in economics mental-models science-tech psychology; do
+            cp "vault/02-KnowledgeBase/$dir/"*.md "src/content/kb/$dir/" 2>/dev/null || echo "No files in $dir"
+          done
+          echo "Content synced:"
+          find src/content -name "*.md" | sort
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install Quartz Plugins
-        run: npx quartz plugin install --from-config
-
-      - name: Build Quartz
-        run: npx quartz build
+      - name: Build Astro site
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: dist
 
   deploy:
     needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

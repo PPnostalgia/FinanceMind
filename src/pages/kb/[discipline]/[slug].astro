@@ -1,0 +1,33 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('kb', e => e.data.publish);
+  return entries.map(entry => {
+    const parts = entry.id.split('/');
+    const discipline = parts[0];
+    const slug = parts.slice(1).join('/').replace(/\.md$/, '') || entry.slug;
+    return {
+      params: { discipline, slug },
+      props: { entry },
+    };
+  });
+}
+
+interface Props { entry: CollectionEntry<'kb'>; }
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<ArticleLayout
+  title={entry.data.title}
+  subtitle={entry.data.title_en}
+  date={entry.data.date}
+  discipline={entry.data.discipline}
+  tags={entry.data.tags}
+  sourceIssue={entry.data.source_issue}
+  type="kb"
+>
+  <Content />
+</ArticleLayout>

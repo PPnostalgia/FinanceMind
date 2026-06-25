@@ -1,8 +1,17 @@
 #!/bin/bash
+# Push site code + trigger GitHub Actions build & deploy
+set -e
+
 cd ~/DailyRepo/FinanceMindSite
-git add .
-git commit -m "content: weekly update $(date +%Y-W%V)"
-git push origin v5
+
+git add -A
+git commit -m "deploy: weekly update $(date +%Y-W%V)" || echo "Nothing to commit"
+git push origin main
+
 echo ""
-echo "✅ 已推送，约2分钟后访问以下地址查看更新："
-echo "   https://ppnostalgia.github.io/knowledge-site/"
+echo "✅ 已推送，GitHub Actions 正在构建，约 2 分钟后访问："
+echo "   https://ppnostalgia.github.io/FinanceMind/"
+echo ""
+echo "⚠  记得同步 vault 内容到 PPnostalgia/FinanceMindObsidianRepo："
+echo "   cd ~/DailyRepo/EconomistVault"
+echo "   git add . && git commit -m 'content: W...' && git push"
