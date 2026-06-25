@@ -6,7 +6,7 @@ configuration:
   enablePopovers: true
   analytics:
     provider: plausible
-  locale: en-US
+  locale: zh-CN
   baseUrl: ppnostalgia.github.io
   ignorePatterns:
     - "00-Issues"
@@ -18,20 +18,20 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Schibsted Grotesk
-      body: Source Sans Pro
-      code: IBM Plex Mono
+      header: "Source Serif 4"      # 标题用衬线体，更有"经济学人"的阅读感
+      body: "Inter"                 
+      code: "JetBrains Mono"
     colors:
       lightMode:
-        light: "#faf8f8"
-        lightgray: "#e5e5e5"
-        gray: "#b8b8b8"
-        darkgray: "#4e4e4e"
-        dark: "#2b2b2b"
-        secondary: "#284b63"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
-        textHighlight: "#fff23688"
+        light: "#faf8f3"             # 米白底色，护眼且有质感
+        lightgray: "#e8e3d8"
+        gray: "#b3aa9c"
+        darkgray: "#3d3530"
+        dark: "#2b2620"
+        secondary: "#9c5a3c"         # 暖棕橙，呼应"经济学人"红的稳重感
+        tertiary: "#7a8b6f"          # 灰绿，知识/成长意象
+        highlight: "rgba(156, 90, 60, 0.15)"
+        textHighlight: "#f0d999cc"
       darkMode:
         light: "#161618"
         lightgray: "#393639"
@@ -182,16 +182,6 @@ plugins:
     enabled: true
   - source: github:quartz-community/tag-page
     enabled: true
-  - source: github:quartz-community/explorer
-    enabled: true
-    layout:
-      position: left
-      priority: 50
-  - source: github:quartz-community/graph
-    enabled: true
-    layout:
-      position: right
-      priority: 10
   - source: github:quartz-community/search
     enabled: true
     layout:
