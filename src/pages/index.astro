@@ -6,6 +6,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const allWechat = await getCollection('wechat', e => e.data.publish);
 const latestArticles = allWechat
+  .filter(e => e.data.article_type !== 'curated')
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+const latestCurated = allWechat
+  .filter(e => e.data.article_type === 'curated')
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
 
@@ -32,10 +37,10 @@ const disciplineLabels: Record<string, string> = {
     <div class="max-w-5xl mx-auto px-5 py-16 md:py-20">
       <p class="text-xs font-semibold tracking-widest uppercase text-secondary mb-4">Finance &amp; Mind</p>
       <h1 class="font-header text-[2rem] md:text-[2.6rem] font-bold text-ink leading-tight mb-4">
-        用《经济学人》<br class="hidden sm:inline" />构建认知图谱
+        用英文好文章<br class="hidden sm:inline" />构建认知图谱
       </h1>
       <p class="text-base text-muted max-w-xl leading-relaxed border-l-[3px] border-secondary pl-4 italic font-header">
-        每周精读一篇，提炼英语语感与知识增量，沉淀为可复用的思维工具。
+        每周精读与精选文章，提炼英语语感与知识增量，沉淀为可复用的思维工具。
       </p>
     </div>
   </section>
@@ -76,7 +81,7 @@ const disciplineLabels: Record<string, string> = {
     </section>
 
     <!-- Latest Articles -->
-    <section>
+    <section class="mb-16">
       <div class="flex items-baseline justify-between mb-6">
         <h2 class="font-header text-[1.15rem] font-bold text-ink">最新精读</h2>
         <a href={`${base}/wechat/`} class="text-sm text-primary hover:text-secondary transition-colors no-underline font-medium">
@@ -91,6 +96,48 @@ const disciplineLabels: Record<string, string> = {
           {latestArticles.map(article => (
             <a
               href={`${base}/wechat/${article.slug}/`}
+              class="group flex items-start justify-between gap-4 py-4 hover:bg-white/60 -mx-3 px-3 rounded-lg transition-colors no-underline"
+            >
+              <div class="flex-1 min-w-0">
+                <p class="text-[0.95rem] font-medium text-ink group-hover:text-primary transition-colors leading-snug mb-1 font-header">
+                  {article.data.title}
+                </p>
+                <div class="flex items-center gap-3 text-xs text-muted">
+                  {article.data.discipline && (
+                    <span>{disciplineLabels[article.data.discipline] ?? article.data.discipline}</span>
+                  )}
+                  {article.data.source_article && (
+                    <span class="italic truncate max-w-[200px]">{article.data.source_article}</span>
+                  )}
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <span class="text-xs text-muted font-mono">
+                  {article.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }).replace('/', '-')}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <!-- Curated Articles -->
+    <section>
+      <div class="flex items-baseline justify-between mb-6">
+        <h2 class="font-header text-[1.15rem] font-bold text-ink">精选文章</h2>
+        <a href={`${base}/curated/`} class="text-sm text-primary hover:text-secondary transition-colors no-underline font-medium">
+          全部 →
+        </a>
+      </div>
+
+      {latestCurated.length === 0 ? (
+        <p class="text-sm text-muted py-8 text-center">暂无精选文章。</p>
+      ) : (
+        <div class="divide-y divide-border">
+          {latestCurated.map(article => (
+            <a
+              href={`${base}/curated/${article.slug}/`}
               class="group flex items-start justify-between gap-4 py-4 hover:bg-white/60 -mx-3 px-3 rounded-lg transition-colors no-underline"
             >
               <div class="flex-1 min-w-0">

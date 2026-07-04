@@ -6,6 +6,7 @@ const wechat = defineCollection({
     title: z.string(),
     source_article: z.string().optional(),
     source_issue: z.string(),
+    article_type: z.enum(['weekly', 'curated']).default('weekly'),
     discipline: z.string().optional(),
     tags: z.array(z.string()).default([]),
     date: z.coerce.date(),

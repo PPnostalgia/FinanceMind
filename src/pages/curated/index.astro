@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-const articles = (await getCollection('wechat', e => e.data.publish && e.data.article_type !== 'curated'))
+const articles = (await getCollection('wechat', e => e.data.publish && e.data.article_type === 'curated'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const disciplineLabels: Record<string, string> = {
@@ -15,29 +15,25 @@ const disciplineLabels: Record<string, string> = {
 };
 ---
 
-<BaseLayout title="精读文章" description="每周精读《经济学人》，兼顾英语学习与知识拓展">
+<BaseLayout title="精选文章" description="值得收藏和反复重读的英文思想文章">
   <div class="max-w-3xl mx-auto px-5 py-10">
-    <!-- Page header -->
     <header class="mb-10">
       <nav class="text-xs text-muted mb-6 flex items-center gap-2">
         <a href={`${base}/`} class="hover:text-primary transition-colors no-underline">首页</a>
         <span>›</span>
-        <span class="text-ink-mid">精读文章</span>
+        <span class="text-ink-mid">精选文章</span>
       </nav>
-      <h1 class="font-header text-[1.9rem] font-bold text-ink mb-2">精读文章</h1>
-      <p class="text-sm text-muted">每期精选原文段落，对照译文 · 生词注释 · 知识延伸</p>
+      <h1 class="font-header text-[1.9rem] font-bold text-ink mb-2">精选文章</h1>
+      <p class="text-sm text-muted">《经济学人》之外，值得收藏的英文思想文章 · 方法论 · 职业与学习策略</p>
     </header>
 
-    <!-- Article list -->
     {articles.length === 0 ? (
-      <p class="text-sm text-muted py-12 text-center">
-        暂无文章。运行 <code class="font-mono bg-border/60 px-1 rounded">npm run sync-content</code> 同步内容。
-      </p>
+      <p class="text-sm text-muted py-12 text-center">暂无精选文章。</p>
     ) : (
       <div class="space-y-0 divide-y divide-border">
         {articles.map(article => (
           <a
-            href={`${base}/wechat/${article.slug}/`}
+            href={`${base}/curated/${article.slug}/`}
             class="group flex items-start justify-between gap-6 py-5 -mx-3 px-3 rounded-lg hover:bg-white/60 transition-colors no-underline"
           >
             <div class="flex-1 min-w-0">

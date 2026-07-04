@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 
 export async function getStaticPaths() {
-  const articles = await getCollection('wechat', e => e.data.publish && e.data.article_type !== 'curated');
+  const articles = await getCollection('wechat', e => e.data.publish && e.data.article_type === 'curated');
   return articles.map(entry => ({
     params: { slug: entry.slug },
     props: { entry },
@@ -23,7 +23,7 @@ const { Content } = await entry.render();
   tags={entry.data.tags}
   sourceArticle={entry.data.source_article}
   sourceIssue={entry.data.source_issue}
-  type="wechat"
+  type="curated"
 >
   <Content />
 </ArticleLayout>
