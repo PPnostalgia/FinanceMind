@@ -5,8 +5,14 @@ const wechat = defineCollection({
   schema: z.object({
     title: z.string(),
     source_article: z.string().optional(),
-    source_issue: z.string(),
-    article_type: z.enum(['weekly', 'curated']).default('weekly'),
+    source_issue: z.string().optional(),
+    article_type: z.enum([
+      'weekly',
+      'curated',
+      'night-reading',
+      'psychology-today',
+      'thought-analysis',
+    ]).default('weekly'),
     discipline: z.string().optional(),
     tags: z.array(z.string()).default([]),
     date: z.coerce.date(),
